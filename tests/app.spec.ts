@@ -48,8 +48,10 @@ test('desktop artwork, source information, keyboard role selection and invalid c
   await page.keyboard.press('Escape');
   await page.getByRole('button',{name:'Begin your story'}).click();
   await page.keyboard.press('2');
+  await expect(page.getByRole('button',{name:'Choose Collector',exact:true})).toHaveAttribute('aria-pressed','true');
   await page.keyboard.press('3');
-  await expect(page.getByText('The Collector', {exact:true}).first()).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Find The Starry Night',exact:true})).toBeVisible();
+  await expect(page.locator('.play-heading')).toContainText('The Collector');
   await expect.poll(()=>page.locator('img').evaluateAll(imgs => imgs.every(i=>(i as HTMLImageElement).complete && (i as HTMLImageElement).naturalWidth > 0))).toBe(true);
 });
 
@@ -81,7 +83,22 @@ test('small screens contain the interface and all artwork files load', async ({p
   await page.getByRole('button',{name:'Begin your story'}).click();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.getByRole('button',{name:'Start adventure'}).click();
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  // The journal control appears only after starting: check all header controls remain on screen.
+  for (const name of ['Cluezeum home','About this exhibition','Open journal','Enable audio']) {
+    const button=page.getByRole('button',{name,exact:true});
+    await expect(button).toBeVisible();
+    const bounds=await button.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(320);
+    expect(bounds!.width).toBeGreaterThanOrEqual(44);
+    expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  }
+  const overflow = await page.evaluate(()=>({
+    viewport: innerWidth, width: document.documentElement.scrollWidth,
+    elements: Array.from(document.querySelectorAll('body *')).filter(el=>el.getBoundingClientRect().right>innerWidth).map(el=>({tag:el.tagName,classes:el.className,right:el.getBoundingClientRect().right}))
+  }));
+  expect(overflow.width,JSON.stringify(overflow)).toBeLessThanOrEqual(overflow.viewport);
   await page.screenshot({path:'test-results/mobile-game.png',fullPage:true});
 });
 

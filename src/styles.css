@@ -8,3 +8,10 @@
 /* Shape and icon controls keep a full touch target on narrow screens. */
 .header-buttons .text-button{min-width:44px;justify-content:center}
 .enlarge-button{min-width:44px;min-height:44px}
+
+/* Starting a game adds a journal control. Wrap the header instead of shrinking touch targets. */
+@media(max-width:740px){
+  .site-header{flex-wrap:wrap;row-gap:8px}
+  .brand{flex-shrink:0}
+  .header-right{margin-left:auto}
+}
