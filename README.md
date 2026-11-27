@@ -61,3 +61,11 @@ No Supabase or server setup is needed. Repository write access and permission to
 ## Verification status
 
 See [implementation log](docs/implementation-log.md) for executed checks and outstanding deployment or browser-verification work. A production build alone does not establish that the site is deployed.
+
+## The Met chapter: The Sky Archive
+
+Select **The Sky Archive** on the home screen to play seven works from *Chasing Clouds* (September 14, 2026–February 28, 2027). Four fictional perspectives offer two route decisions and eight endings. Artwork introductions link directly to Met records, while mission prompts are labeled as fiction.
+
+The chapter is a virtual companion. All seven works appear in the exhibition object list, but four individual records say “Not on view”; the interface reports this discrepancy and does not promise a physical walking route. See [Met sources and image provenance](docs/met-sources.md). Existing Van Gogh saves remain readable; changing chapters asks before replacing the current adventure.
+
+If Playwright's bundled Chromium is unavailable and Google Chrome is already installed, run `PLAYWRIGHT_CHANNEL=chrome npm run test:e2e`. Otherwise use the browser installation command above.

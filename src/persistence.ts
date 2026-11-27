@@ -7,10 +7,11 @@ export function decodeProgress(value: string): GameState | null {
   if(value.length > 3500) return null;
   try {
     const raw = JSON.parse(decodeURIComponent(value));
-    if(!raw || raw.v !== 1 || !roleIds.includes(raw.role) || typeof raw.audio !== 'boolean' || !Array.isArray(raw.route) || !Array.isArray(raw.answers) || !Array.isArray(raw.choices) || raw.route.length > 5 || raw.answers.length > 5 || raw.choices.length > 2) return null;
+    if(!raw || raw.v !== 1 || !roleIds.includes(raw.role) || typeof raw.audio !== 'boolean' || !Array.isArray(raw.route) || !Array.isArray(raw.answers) || !Array.isArray(raw.choices) || raw.route.length > 7 || raw.answers.length > 7 || raw.choices.length > 2) return null;
+    if(raw.chapter !== undefined && raw.chapter !== 'moma' && raw.chapter !== 'met') return null;
     // Replay a short, bounded path. Only states reachable through the actual game can load.
-    let s = {...createGame(raw.role), audio:raw.audio};
-    for(let step = 0; step < 32; step++) {
+    let s = {...createGame(raw.role,raw.chapter??'moma'), audio:raw.audio};
+    for(let step = 0; step < 45; step++) {
       if(s.stage === raw.stage && JSON.stringify(s.route) === JSON.stringify(raw.route) && JSON.stringify(s.answers) === JSON.stringify(raw.answers) && JSON.stringify(s.choices) === JSON.stringify(raw.choices)) return s;
       const id = currentArtwork(s);
       if(s.stage === 'ending') return null;
