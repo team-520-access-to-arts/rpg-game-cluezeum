@@ -1,5 +1,10 @@
+import { metArtworks, metArtworkIds, metMissions, metRoles } from './met-content';
 export const artworkIds = ['starry', 'olive', 'roulin', 'potato', 'gachet'] as const;
-export type ArtworkId = typeof artworkIds[number];
+type MomaArtworkId = typeof artworkIds[number];
+export type ArtworkId = MomaArtworkId | typeof metArtworkIds[number];
+export type ChapterId = 'moma' | 'met';
+export interface Artwork { title:string; artist?:string; date:string; medium:string; source:string; status:string; credit:string; alt:string; detail:string; theme:Theme; museum?:string; checked?:string }
+export interface Role { name:string; label:string; subtitle:string; story:string; symbol:string; endings:Record<Theme,{title:string;text:string}> }
 export const roleIds = ['detective', 'collector', 'artist', 'roulin'] as const;
 export type RoleId = typeof roleIds[number];
 export type Theme = 'form' | 'people';
@@ -17,7 +22,7 @@ export const roles: Record<RoleId, { name: string; label: string; subtitle: stri
     form: { title: 'Messenger of Places', text: 'Your imaginary postcards carry the movement of places: a night sky, a grove, and the marks that bring a scene to life. Your message to the next visitor is simple: slow down, and follow where the lines lead.' },
     people: { title: 'Messenger of People', text: 'Your imaginary postcards carry moments of company and attention. A portrait and a shared table become invitations to notice other people. Your message to the next visitor: a small gesture can tell a large story.' } } },
 };
-export const artworks: Record<ArtworkId, { title: string; date: string; medium: string; source: string; status: string; credit: string; alt: string; detail: string; theme: Theme }> = {
+const momaArtworks: Record<MomaArtworkId, Artwork> = {
   starry: { title:'The Starry Night', date:'June 1889', medium:'Oil on canvas', source:'https://www.moma.org/collection/works/79802', status:'On view · Gallery 501', credit:'Acquired through the Lillie P. Bliss Bequest (by exchange)', alt:'A blue night sky with bright stars and a crescent moon above a village; a dark cypress rises at the left.', detail:'MoMA identifies the tall foreground tree as a cypress. The scene combines observation and imagination.', theme:'form' },
   olive: { title:'The Olive Trees', date:'June–July 1889', medium:'Oil on canvas', source:'https://www.moma.org/collection/works/80013', status:'On view · Gallery 501', credit:'Mrs. John Hay Whitney Bequest', alt:'Twisting olive trees beneath blue mountains and a pale, curling cloud.', detail:'Painted at Saint-Rémy in 1889. MoMA discusses this landscape alongside The Starry Night.', theme:'form' },
   roulin: { title:'Portrait of Joseph Roulin', date:'Early 1889', medium:'Oil on canvas', source:'https://www.moma.org/collection/works/79105', status:'Collection work · Not on view', credit:'Acquired by exchange, 1989; full credit in the MoMA record', alt:'A bearded man in a blue uniform and cap marked POSTES, against a green floral background.', detail:'Joseph Roulin was a postal employee and a friend of Van Gogh in Arles.', theme:'people' },
@@ -26,7 +31,7 @@ export const artworks: Record<ArtworkId, { title: string; date: string; medium: 
 };
 export interface Mission { title: string; prompt: string; question: string; options: [string,string,string]; correct: number; hint: string; clue: string; explanation: string }
 const q = (title: string, prompt: string, question: string, options: [string,string,string], correct: number, hint: string, clue: string, explanation: string): Mission => ({title,prompt,question,options,correct,hint,clue,explanation});
-export const missions: Record<RoleId, Record<ArtworkId, Mission>> = {
+export const momaMissions: Record<RoleId, Record<MomaArtworkId, Mission>> = {
  detective: {
   starry:q('The cypress clue','Your first lead connects the village to the sky. Look for a shape that crosses both.','What rises tallest in the left foreground?',['A church tower','A dark tree','A mountain peak'],1,'Start at the bottom-left and follow the dark silhouette upward.','A bridge of shapes','The dark cypress reaches up across the sky. It gives your eye a path between land and stars.'),
   olive:q('A familiar rhythm','Test your first lead in daylight. Look for a repeated movement in this grove.','How do the tree trunks travel upward?',['They bend and twist','They form perfect straight columns','They are hidden completely'],0,'Trace the central trunk with your eyes, without looking at the device.','Movement returns','The trunks bend and divide. Curving shapes give you another visual link to the night sky.'),
@@ -57,3 +62,10 @@ export const missions: Record<RoleId, Record<ArtworkId, Mission>> = {
  }
 };
 export const imageUrl = (id: ArtworkId) => `${import.meta.env.BASE_URL}art/${id}.jpg`;
+
+export const allArtworkIds: ArtworkId[] = [...artworkIds,...metArtworkIds];
+export const artworks: Record<ArtworkId,Artwork> = {...momaArtworks,...metArtworks};
+export const missions = Object.fromEntries(roleIds.map(role=>[role,{...momaMissions[role],...metMissions[role]}])) as Record<RoleId,Record<ArtworkId,Mission>>;
+export const chapterArtworks = (chapter:ChapterId): readonly ArtworkId[] => chapter==='met'?metArtworkIds:artworkIds;
+export const chapterRoles = (chapter:ChapterId): Record<RoleId,Role> => chapter==='met'?metRoles:roles;
+export const chapterTitle = (chapter:ChapterId) => chapter==='met'?'The Sky Archive':'The Van Gogh Chapter';

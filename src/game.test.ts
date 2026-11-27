@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createGame, transition, branchOptions, currentArtwork, getEnding } from './game';
-import { roles, missions, artworkIds } from './content';
+import { roles, missions, momaMissions, artworkIds } from './content';
 
 describe('five-stop stories', () => {
   const endings = new Set<string>();
@@ -41,7 +41,7 @@ describe('five-stop stories', () => {
   it('offers eight different conclusions', () => expect(endings.size).toBe(8));
   it('has distinct mission copy for all twenty role/work pairs', () => {
     expect(Object.keys(roles)).toHaveLength(4);
-    expect(new Set(Object.values(missions).flatMap(m => Object.values(m).map(q => q.prompt))).size).toBe(20);
+    expect(new Set(Object.values(momaMissions).flatMap(m => Object.values(m).map(q => q.prompt))).size).toBe(20);
   });
   it('ignores input in the wrong stage', () => {
     const s = createGame('detective');
